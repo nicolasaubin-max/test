@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: #f3f4f6;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0f1115;
+    color: #e5e7eb;
+  }
+}
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  #root {
+    background: #16171d;
+  }
+}
+
+button {
+  font-family: inherit;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
