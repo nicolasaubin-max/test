@@ -1,5 +1,5 @@
 diff --git a/setup.sh b/setup.sh
-index bf82bee..db6b7f0 100755
+index bf82bee..be59e31 100755
 --- a/setup.sh
 +++ b/setup.sh
 @@ -1,5 +1,5 @@
@@ -9,7 +9,12 @@ index bf82bee..db6b7f0 100755
  #
  #   ./setup.sh           install everything that's missing, then check it all works
  #   ./setup.sh --check   only check, change nothing
-@@ -20,20 +20,38 @@ step() { printf "\n\033[1m%s\033[0m\n" "$1"; }
+@@ -16,24 +16,43 @@ CHECK_ONLY=0
+ 
+ ok()   { printf "  \033[32m✓\033[0m %s\n" "$1"; }
+ bad()  { printf "  \033[31m✗\033[0m %s\n" "$1"; FAILED=1; }
++warn() { printf "  \033[33m!\033[0m %s\n" "$1"; }
+ step() { printf "\n\033[1m%s\033[0m\n" "$1"; }
  FAILED=0
  
  step "1. Your computer"
@@ -55,7 +60,7 @@ index bf82bee..db6b7f0 100755
    ok "Homebrew $(brew --version | head -1 | awk '{print $2}')"
  else
    bad "Homebrew is not installed. It needs your Mac password, so run this one yourself in Terminal:"
-@@ -43,19 +61,19 @@ else
+@@ -43,19 +62,19 @@ else
  fi
  
  step "3. Tools (ffmpeg, Node, Python)"
@@ -78,7 +83,7 @@ index bf82bee..db6b7f0 100755
  
  # Python 3.10+ for Whisper (the one built into macOS is too old)
  PY=""
-@@ -65,8 +83,12 @@ for c in python3.12 python3.11 python3.13 python3.10 python3; do
+@@ -65,8 +84,12 @@ for c in python3.12 python3.11 python3.13 python3.10 python3; do
    fi
  done
  if [ -z "$PY" ] && [ $CHECK_ONLY = 0 ]; then
@@ -93,7 +98,7 @@ index bf82bee..db6b7f0 100755
  fi
  [ -n "$PY" ] && ok "Python $("$PY" -c 'import platform; print(platform.python_version())')" || bad "Python 3.10+ is missing"
  
-@@ -86,7 +108,12 @@ elif [ $CHECK_ONLY = 1 ]; then
+@@ -86,7 +109,12 @@ elif [ $CHECK_ONLY = 1 ]; then
    bad "$WPKG or yt-dlp is not installed"
  elif [ -n "$PY" ]; then
    echo "  creating .venv and installing $WPKG (a few minutes the first time)..."
@@ -107,3 +112,13 @@ index bf82bee..db6b7f0 100755
      && ok "$WPKG + yt-dlp (installed)" || bad "could not install $WPKG"
  fi
  
+@@ -103,7 +131,8 @@ fi
+ if [ $CHECK_ONLY = 0 ] && [ $FAILED = 0 ]; then
+   step "6. First-run downloads"
+   echo "  fetching the Whisper speech model (about 1.5 GB, one time only)..."
+-  .venv/bin/python tools/asr.py --warmup && ok "Whisper model ready" || bad "could not download the Whisper model"
++  .venv/bin/python tools/asr.py --warmup >/dev/null 2>&1 && ok "Whisper model ready" \
++    || warn "could not download the Whisper model now; transcription will retry it on first use"
+   echo "  fetching Remotion's rendering browser (one time only)..."
+   (cd engine && npx --no-install remotion browser ensure >/dev/null 2>&1) && ok "render browser ready" || ok "render browser will download on the first render"
+ fi
